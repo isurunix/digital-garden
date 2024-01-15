@@ -19,7 +19,7 @@ draft: true
 
 ## High Level Design
 
-#### Placement of Functionality (Where to put the limiter)
+### Placement of Functionality (Where to put the limiter)
 - **Client side rate limiter**
   While it is technically possible to place the rate limiter on client side this can be highly unpredictable as it can be easily forged. Also we may not always have the control of the client. So it doesn't make much sense to place a rate-limiter in client app ^6ba237
 - **Server side rate limiter**
@@ -60,12 +60,15 @@ draft: true
 > 
 > Most often a middle-ware rate limiter makes sense since most time we already have a api-gateway in place and it would be wise to have the rate limiter over there. However this depends on the company's tech stack and the current application eco-system.
 
-#### Rate Limiting Algorithms
+### Rate Limiting Algorithms
 
 Once we figured out where to place our rate limiter next thing we need to decide is which algorithm we are going to use to limit the number of requests. There are couple of popular algorithms used in for rate limiting.
 
-1. Token Bucket
+1. [Token Bucket](token-bucket)
 2. Leaking Bucket
 3. Fixed Window Counter
 4. Sliding Window
 5. Sliding Window Counter
+
+## High Level Architecture
+
