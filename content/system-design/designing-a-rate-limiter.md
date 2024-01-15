@@ -54,10 +54,12 @@ draft: true
   - **Cons**
       - One more component to maintain
 
-> Summary
-> 
+**Summary**
+
 > Client side rate limiter is never a good choice. [[#^6ba237]]
 > 
+> Most often a middle-ware rate limiter makes sense since most time we already have a api-gateway in place and it would be wise to have the rate limiter over there. However this depends on the company's tech stack and the current application eco-system.
 
-#### Rate Limiting Algotithms
+#### Rate Limiting Algorithms
 
+Once we figured out where to place our rate limiter next thing we need to decide it which 
