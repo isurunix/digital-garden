@@ -62,4 +62,10 @@ draft: true
 
 #### Rate Limiting Algorithms
 
-Once we figured out where to place our rate limiter next thing we need to decide it which 
+Once we figured out where to place our rate limiter next thing we need to decide is which algorithm we are going to use to limit the number of requests. There are couple of popular algorithms used in for rate limiting.
+
+1. Token Bucket
+2. Leaking Bucket
+3. Fixed Window Counter
+4. Sliding Window
+5. Sliding Window Counter
