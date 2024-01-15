@@ -23,7 +23,10 @@ draft: true
     - **Client side rate limiter**
       While it is technically possible to place the rate limiter on client side this can be highly unpredictable as it can be easily forged. Also we may not always have the control of the client. So it doesn't make much sense to place a rate-limiter in client app
     - **Server side rate limiter**
-      Rate limiter can be placed on the app server it self as a part of the application service. However this add 
+      Rate limiter can be placed on the app server it self as a part of the application service. 
+      
+      Pros:
+      - 
 
 ```mermaid
 graph LR
