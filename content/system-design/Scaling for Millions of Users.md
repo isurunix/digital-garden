@@ -22,7 +22,7 @@ Things to consider
     - Vertical scaling is limited by CPU, Memory, Space and cost
     - Horizontal scaling require adding new components like load balancers and changing the application to be able to share load
       
-- Scale the database ([[database-scaling]])
+- Scale the database ([[Database Scaling]])
     - Database Replication
     - Database Sharding
  

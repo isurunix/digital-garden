@@ -7,15 +7,15 @@ date: 2023-09-16
 ---
 
 When a system grows it's data also grows with it requiring the database to be scaled in order to handle loads of data.
-The two broad approches for scaling a database is vertical scaling and horizontal scaling.
+The two broad approaches for scaling a database is vertical scaling and horizontal scaling.
 Same as in scaling an application server vertical database scaling refers to allocating more resources to the database
-server and horizonal scaling referes to techiniques like database replication and database sharding
+server and horizontal scaling refers to techniques like database replication and database sharding
 
 However as in every system design it all depends on the context. Before blindly jumping into replication or sharding there might be other possible optimization you could do to scale your database to support the load
 
 ## Query Optimizations & Connection Pools
 
-Effectively these things are should be there from the begining if you are planning to cater to a large amount of requets with low latency. But it never hurts to pay the first attention to these basics and make sure things are in order. 
+Effectively these things are should be there from the beginning if you are planning to cater to a large amount of requests with low latency. But it never hurts to pay the first attention to these basics and make sure things are in order. 
 
 - Proper indexing
 - Add redundant columns (denormalize data) to reduce join queries
