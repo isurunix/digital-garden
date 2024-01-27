@@ -10,5 +10,6 @@ These notes are written on Obsidian and I'm using Quartz to generate this my own
 
 ### System Design
 - [[Database Scaling]]
-- 
+- [[Designing a Rate Limiter]]
+- [[Scaling for Millions of Users]]
 
