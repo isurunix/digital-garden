@@ -1,3 +1,7 @@
+---
+title: Outline
+---
+
 ## Course Modules
 
 1. [[Lecture Notes/CI7350_Agile_Project_Development/_index|CI7350 - Agile Project Management]]
