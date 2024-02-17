@@ -7,4 +7,4 @@ title: CI7260 - Software Quality Engineering
 
 ## Lecture Notes
 
-* [[Lecture Notes/CI7260_Software_Quality_Engineering/2024-02-17|2024-02-17]]
+* [[lecture-notes/CI7260_Software_Quality_Engineering/2024-02-17|2024-02-17]]
