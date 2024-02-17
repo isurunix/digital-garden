@@ -1,4 +1,4 @@
 ## Course Modules
 
-1. [[CI7350 - Agile Project Development|CI7350 - Agile Project Development]]
-2. [[CI7260 - Software Quality Engineering|CI7260 - Software Quality Engineering]]
+1. [[Lecture Notes/CI7350_Agile_Project_Development/_index|_index]]
+2. [[Lecture Notes/CI7260_Software_Quality_Engineering/_index|_index]]
