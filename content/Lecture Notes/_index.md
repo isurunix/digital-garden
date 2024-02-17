@@ -1,5 +1,5 @@
 ---
-title: Outline
+title: Lecture Notes
 ---
 
 ## Course Modules
