@@ -8,6 +8,7 @@ Decided tech stack for the project
 - back-end: Java/Spring Boot
 - database: MySQL
 
+Team to work on the below action items and meet again on Monday
 
 ## Action Items
 
