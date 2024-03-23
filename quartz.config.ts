@@ -10,7 +10,7 @@ const config: QuartzConfig = {
       provider: "plausible",
     },
     baseUrl: "https://notes.isurubuddhika.dev",
-    ignorePatterns: ["private", "templates", ".obsidian", "Excalidraw", "Msc"],
+    ignorePatterns: ["private", "templates", ".obsidian", "Excalidraw", "lecture-notes"],
     defaultDateType: "created",
     theme: {
       cdnCaching: true,
