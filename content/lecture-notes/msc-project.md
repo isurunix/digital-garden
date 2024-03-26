@@ -11,3 +11,5 @@ https://github.com/jayateertha043/Decentralized-Medical-Records
 https://github.com/SuyashMore/SwasthyaChain
 https://link.springer.com/article/10.1007/s10916-005-7984-1
 
+
+https://github.com/hsouf/decentralized-kyc-poc
