@@ -3,8 +3,9 @@ title: My Digital Garden
 description: Software engineering notes and my random brain bleeds from building distributed systems, micro-services, and enterprise applications
 socialDescription: Personal knowledge base covering system design, micro-services, Java/Spring Boot, AWS, and engineering leadership insights from a Technical Specialist
 layout: homepage
+showGraph: "false"
 ---
-*Software Engineering Notes & My Random Brain Bleeds* 
+## Software Engineering Notes & My Random Brain Bleeds
 
 This is where I dump my thoughts about software engineering, system design, and whatever I'm currently trying to figure out. Some notes are polished, most are works in progress, and a few are probably wrong. 
 

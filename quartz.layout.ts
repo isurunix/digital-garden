@@ -45,7 +45,11 @@ export const defaultContentPageLayout: PageLayout = {
     Component.Explorer(),
   ],
   right: [
-    Component.Graph(),
+    // hide graph if frontmatter field showGraph is false
+    Component.ConditionalRender({
+      component: Component.Graph(),
+      condition: (page) => page.fileData.frontmatter?.showGraph !== false,
+    }),
     Component.DesktopOnly(Component.TableOfContents()),
     Component.Backlinks(),
   ],
