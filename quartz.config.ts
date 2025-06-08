@@ -16,7 +16,14 @@ const config: QuartzConfig = {
       provider: "plausible",
     },
     baseUrl: "https://notes.isurubuddhika.dev",
-    ignorePatterns: ["private", "templates", ".obsidian", "Excalidraw", "lecture-notes"],
+    ignorePatterns: [
+      "private",
+      "templates",
+      ".obsidian",
+      "Excalidraw",
+      "lecture-notes",
+      "clippings",
+    ],
     defaultDateType: "created",
     theme: {
       fontOrigin: "googleFonts",
@@ -51,6 +58,7 @@ const config: QuartzConfig = {
         },
       },
     },
+    locale: "en-US",
   },
   plugins: {
     transformers: [
