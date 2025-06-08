@@ -14,14 +14,13 @@ export const sharedPageComponents: SharedLayout = {
   }),
 }
 
-// components for pages that display a single page (e.g. a single note)
-export const defaultContentPageLayout: PageLayout = {
+// custom layout for the index page
+export const indexPageLayout: PageLayout = {
   beforeBody: [
     Component.ConditionalRender({
       component: Component.Breadcrumbs(),
       condition: (page) => page.fileData.slug !== "index",
     }),
-    Component.ArticleTitle(),
     Component.ContentMeta(),
     Component.TagList(),
   ],
@@ -47,13 +46,14 @@ export const defaultContentPageLayout: PageLayout = {
   ],
 }
 
-// custom layout for the index page
-export const indexPageLayout: PageLayout = {
+// components for pages that display a single page (e.g. a single note)
+export const defaultContentPageLayout: PageLayout = {
   beforeBody: [
     Component.ConditionalRender({
       component: Component.Breadcrumbs(),
       condition: (page) => page.fileData.slug !== "index",
     }),
+    Component.ArticleTitle(),
     Component.ContentMeta(),
     Component.TagList(),
   ],
