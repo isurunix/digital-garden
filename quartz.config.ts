@@ -8,7 +8,8 @@ import * as Plugin from "./quartz/plugins"
  */
 const config: QuartzConfig = {
   configuration: {
-    pageTitle: "🛸 DEV/RANDOM",
+    pageTitle: "My Digital Garden",
+    pageTitleSuffix: " | Isuru Buddhika Pathirana",
     enableSPA: true,
     enablePopovers: true,
     analytics: {
