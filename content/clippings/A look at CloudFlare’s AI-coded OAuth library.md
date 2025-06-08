@@ -1,0 +1,70 @@
+---
+title: "A look at CloudFlare’s AI-coded OAuth library"
+source: "https://neilmadden.blog/2025/06/06/a-look-at-cloudflares-ai-coded-oauth-library/"
+author:
+  - "[[Neil Madden]]"
+published: 2025-06-06
+created: 2025-06-08
+description: "I decided today to take a look at CloudFlare's new OAuth provider library, which they apparently coded almost entirely with Anthropic's Claude LLM: This library (including the schema documentation) was largely written with the help of Claude, the AI model by Anthropic. Claude's output was thoroughly reviewed by Cloudflare engineers with careful attention paid to security…"
+tags:
+  - "clippings"
+---
+I decided today to take a look at [CloudFlare’s new OAuth provider library](https://github.com/cloudflare/workers-oauth-provider), which they apparently coded almost entirely with Anthropic’s Claude LLM:
+
+> This library (including the schema documentation) was largely written with the help of [Claude](https://claude.ai/), the AI model by Anthropic. Claude’s output was thoroughly reviewed by Cloudflare engineers with careful attention paid to security and compliance with standards. Many improvements were made on the initial output, mostly again by prompting Claude (and reviewing the results). Check out the commit history to see how Claude was prompted and what code it produced.  
+>   
+> \[…\]
+> 
+> To emphasize, **this is not “vibe coded”**. Every line was thoroughly reviewed and cross-referenced with relevant RFCs, by security experts with previous experience with those RFCs. I was *trying* to validate my skepticism. I ended up proving myself wrong.
+
+I have done a fair amount of LLM-assisted “agentic” coding of this sort recently myself. I’m also an expert in OAuth, having written [API Security in Action](https://www.manning.com/books/api-security-in-action), been on the OAuth Working Group at the IETF for years, and previously been the tech lead and then security architect for a [leading OAuth provider](https://en.wikipedia.org/wiki/ForgeRock). (I also have a PhD in AI from an [intelligent agents group](https://www.nottingham.ac.uk/computerscience/research/agents-lab.aspx), but that predates the current machine learning craze). So I was super interested to see what it had produced, so I took a look while sitting in some meetings today. Disclaimer: I’ve only had a brief look and raised a few bugs, not given it a full review.
+
+Initially, I was fairly impressed by the code. The code is all in one file, which is common from my experience from LLM coding, but it’s fairly well structured without too many of the useless comments that LLMs love to sprinkle over a codebase, and some actual classes and higher-level organisation.
+
+There are some tests, and they are OK, but they are woefully inadequate for what I would expect of a critical auth service. Testing every MUST and MUST NOT in the spec is a bare minimum, not to mention as many abuse cases as you can think of, but none of that is here from what I can see: just basic functionality tests. (From a cursory look at the code, I’d say there are probably quite a few missing MUST checks, particularly around validating parameters, which is pretty light in the current implementation).
+
+The first thing that stuck out for me was what I like to call “YOLO CORS”, and is not that unusual to see: setting CORS headers that effectively disable the same origin policy almost entirely for all origins:
+
+There are cases where this kind of thing is OK, and I haven’t looked in detail at why they’ve done this, but it looks really suspicious to me. You should almost never need to do this. In this case, [the commit log](https://github.com/cloudflare/workers-oauth-provider/commit/16ed01f825d5bcc2fa8862f2da719495c92963c3) reveals that it was the humans that decided on this approach, not the LLM. They haven’t enabled credentials at least, so [the sorts of problems this usually results in](https://portswigger.net/web-security/cors#server-generated-acao-header-from-client-specified-origin-header) probably don’t apply.
+
+Talking of headers, there is a distinct lack of [standard security headers](https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html) in the responses produced. Many of these don’t apply to APIs, but some do (and often in surprising ways). For example, in my book I show how to exploit an XSS vulnerability against a JSON API: just because you’re returning well-formed JSON doesn’t mean that’s how a browser will interpret it. I’m not familiar with CloudFlare Workers, so maybe it adds some of these for you, but I’d expect at least an ` X-Content-Type-Options: nosniff` header and HTTP Strict Transport Security to protect the bearer tokens being used.
+
+There are some odd choices in the code, and things that lead me to believe that the people involved are not actually familiar with the OAuth specs at all. For example, [this commit adds support for public clients](https://github.com/cloudflare/workers-oauth-provider/commit/a103ed06d94cc097db0744da36618153e1f27789), but does so by implementing the deprecated “implicit” grant ([removed in OAuth 2.1](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-13#name-removal-of-the-oauth-20-imp)). This is absolutely not needed to support public clients, especially when the rest of the code implements PKCE and relaxes CORS anyway. The commit message suggests that they didn’t know what was needed to support public clients and so asked Claude and it suggested the implicit grant. The implicit grant is hidden behind a feature flag, but that flag is only checked in an entirely optional helper method for parsing the request, not at the point of token issuance.
+
+Another hint that this is not written by people familiar with OAuth is that they have [implemented Basic auth support incorrectly](https://github.com/cloudflare/workers-oauth-provider/issues/41). This is a classic bug in OAuth provider implementations because people (and LLMs, apparently) assume that it is just vanilla Basic auth, but OAuth adds a twist of URL-encoding everything first (because charsets are a mess). Likewise, the code has a secondary bug if you have a colon in the client secret (allowed by the spec). I don’t think either of these are issues for this specific implementation, because it always generates client IDs and secrets and so can control the format, but I haven’t looked in detail.
+
+A more serious bug is that the code that generates token IDs is not sound: [it generates biased output](https://github.com/cloudflare/workers-oauth-provider/issues/42). This is a classic bug when people naively try to generate random strings, and the [LLM spat it out in the very first commit](https://github.com/cloudflare/workers-oauth-provider/commit/3b2ae809e9256d292079bb15ea9fe49439a0779c) as far as I can see. I don’t think it’s exploitable: it reduces the entropy of the tokens, but not far enough to be brute-forceable. But it somewhat gives the lie to the idea that experienced security professionals reviewed every line of AI-generated code. If they did and they missed this, then they were way too trusting of the LLM’s competence. (I don’t think they did: according to the commit history, there were 21 commits directly to main on the first day from one developer, no sign of any code review at all).
+
+I had a brief look at the encryption implementation for the token store. I mostly like the design! It’s quite smart. From the commit messages, we can see that the design came from the human engineers, but I was quite impressed by the implementation. It’s worth [reproducing the commit message](https://github.com/cloudflare/workers-oauth-provider/commit/adcbb5de9c24f5b6a7dbea2e0a313a87c304d9bb) from this work here, which shows the engineer’s interactions with Claude to get the desired code implemented:
+
+> Ask Claude to store the props encrypted.
+> 
+> prompt: I would like to encrypt the \`props\` stored in \`Grant\` and \`Token\` records. It should be encrypted such that you need a valid token to decrypt. This is a bit tricky since there are multiple valid tokens over time: there’s the authorization code, the refresh tokens (which rotate), and individual access tokens. We don’t want to repeatedly re-encrypt \`props\`. Instead, we should encrypt in once, with a symmetric key, and then we should store that key “wrapped” for each token, while the token is valid. Please use WebCrypto to implement all cryptography.
+> 
+> Claude started on the wrong track making me realize I forgot an important design consideration:
+> 
+> prompt: One thing I forgot to note: The \`listUserGrants()\` helper function will no longer be able to return the \`props\`, since it doesn’t have any token with which to decript it. That’s OK: \`props\` need only be delivered to the app upon an authorized API request. We should actually change \`listUserGrants()\` to make it return a narrower representation of a grant. Right now it returns the entire grant record from storage, but we really only need it to return \`id\`, \`clientId\`, \`userId\`, \`scope\`, \`metadata\`, and \`createdAt\`. We don’t need to return any of the token IDs or code challenge information.
+> 
+> Claude produced beautiful code with one big flaw.
+> 
+> prompt: There’s a security flaw in the way you wrap keys for tokens: You used a SHA-256 hash of the token as the key material for the wrapping. However, SHA-256 is also how we compute “token IDs”. With this construction, someone would be able to unwrap the keys using only the token ID, which is stored alongside the wrapped keys, hence all keys can be trivially unwrapped. To fix this, we need to compute the hash differently when computing the key material for wrapping, in such a way that it’s not possible to derive the key material from the token ID.
+> 
+> Claude initially tried to solve this by switching to using PBKDF2 with 100,000 iterations to derive the key material.
+> 
+> prompt: PDKDF2 with 100000 iterations would be very expensive. This would be important if the input were a low-entropy password, but is not necessary for high-entropy input. Instead of PBKDF2, let’s use a SHA-256 HMAC, with a static HMAC key (which essentially acts as the “salt”).
+> 
+> Claude produced code that used a string “OAUTH\_PROVIDER\_WRAPPING\_KEY\_HMAC\_v1” as the HMAC key.
+> 
+> prompt: This looks pretty good, but for performance, let’s define WRAPPING\_KEY\_HMAC\_KEY as a 32-byte array, so that it doesn’t have to be encoded or hashed down to the right size (as HMAC would do for larger keys). Here are 32 bytes of hex which I have chosen randomly, to use as the HMAC key: 22 7e 26 86 8d f1 e1 6d 80 70 ea 17 97 5b 47 a6 82 18 fa 87 28 ae de 85 b5 1d 4a d9 96 ca ca 43
+
+(NB: using a hard-coded “key” here is fine: it’s essentially HKDF-Extract with a fixed random salt, which is fine and dandy for this use-case. The security property we’re looking for here is that the two uses are *independent random oracles*, for which this is a decent design. I would maybe use the same approach for generating the token ID too, with a different salt, but that’s a minor tweak).
+
+What this interaction shows is how much knowledge you need to bring when you interact with an LLM. The “one big flaw” Claude produced in the middle would probably not have been spotted by someone less experienced with crypto code than this engineer obviously is. And likewise, many people would probably not have questioned the weird choice to move to PBKDF2 as a response: LLMs really do not “reason” in any real way.
+
+## Closing Thoughts
+
+As a first cut of an OAuth library, it’s not bad, but I wouldn’t really recommend it for use *yet*. In my experience, it is very hard to build a correct and **secure** OAuth provider implementation, and it deserves way more time and attention than has clearly gone into this one (yet). IMO, it’s not an appropriate domain for testing out an LLM. At ForgeRock, we had *hundreds* of security bugs in our OAuth implementation, and that was despite having *100s of thousands* of automated tests run on every commit, threat modelling, top-flight SAST/DAST, and extremely careful security review by experts. The idea that you can get an LLM to knock one up for you is not serious.
+
+The commit history of this project is absolutely fascinating. The engineers clearly had a good idea of many aspects of the design, and the LLM was tightly controlled and produced decent code. (LLMs are absolutely good at coding in this manner). But it still tried to do some stupid stuff, some of which were caught by the engineers, some were not. I’m sure some are still in there. Is this worse than if a human had done it? Probably not. Many of these same mistakes can be found in popular Stack Overflow answers, which is probably where Claude learnt them from too. But I know many engineers who would have done a better job, because they are extremely diligent. Code like this needs careful attention. Details matter. Yes, this does come across as a bit “vibe-coded”, despite what the README says, but so does a lot of code I see written by humans. LLM or not, we have to give a shit.
+
+What I am taking away from my experience with LLMs, and from reviewing this project is this: you need to have a clear idea in your head of the kind of code you’re expecting the LLM to produce to be able to judge whether it did a good job. Often, to really know what that looks like, and engage your [“System 2” thinking](https://en.wikipedia.org/wiki/Thinking,_Fast_and_Slow) (so you’re not just accepting what’s in front of you as the best way to do things), you need to have built one yourself first. For trivial things where I don’t really care how it’s done, then sure, I’m happy to let an LLM do whatever it likes. But for important things, like *my fucking auth system*, I’d much rather do it myself and be sure that I *really* thought about it.
