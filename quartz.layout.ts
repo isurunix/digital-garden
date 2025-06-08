@@ -60,7 +60,9 @@ export const defaultContentPageLayout: PageLayout = {
     Component.DesktopOnly(Component.TableOfContents()),
     // show recent notes on homepage
     Component.ConditionalRender({
-      component: Component.RecentNotes(),
+      component: Component.RecentNotes({
+        filter: (note) => note.frontmatter?.title !== "googleabf03e21db30afa3",
+      }),
       condition: (page) => page.fileData.frontmatter?.layout === "homepage",
     }),
     Component.Backlinks(),
