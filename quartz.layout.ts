@@ -55,6 +55,11 @@ export const defaultContentPageLayout: PageLayout = {
       condition: (page) => page.fileData.frontmatter?.showGraph !== false,
     }),
     Component.DesktopOnly(Component.TableOfContents()),
+    // show recent notes on homepage
+    Component.ConditionalRender({
+      component: Component.RecentNotes(),
+      condition: (page) => page.fileData.frontmatter?.layout === "homepage",
+    }),
     Component.Backlinks(),
   ],
 }
