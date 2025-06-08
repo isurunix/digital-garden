@@ -14,38 +14,6 @@ export const sharedPageComponents: SharedLayout = {
   }),
 }
 
-// custom layout for the index page
-export const indexPageLayout: PageLayout = {
-  beforeBody: [
-    Component.ConditionalRender({
-      component: Component.Breadcrumbs(),
-      condition: (page) => page.fileData.slug !== "index",
-    }),
-    Component.ContentMeta(),
-    Component.TagList(),
-  ],
-  left: [
-    Component.PageTitle(),
-    Component.MobileOnly(Component.Spacer()),
-    Component.Flex({
-      components: [
-        {
-          Component: Component.Search(),
-          grow: true,
-        },
-        { Component: Component.Darkmode() },
-        { Component: Component.ReaderMode() },
-      ],
-    }),
-    Component.Explorer(),
-  ],
-  right: [
-    Component.Graph(),
-    Component.DesktopOnly(Component.TableOfContents()),
-    Component.Backlinks(),
-  ],
-}
-
 // components for pages that display a single page (e.g. a single note)
 export const defaultContentPageLayout: PageLayout = {
   beforeBody: [
@@ -53,7 +21,11 @@ export const defaultContentPageLayout: PageLayout = {
       component: Component.Breadcrumbs(),
       condition: (page) => page.fileData.slug !== "index",
     }),
-    Component.ArticleTitle(),
+    // skip article title rendering when page has frontmatter layout set to homepage
+    Component.ConditionalRender({
+      component: Component.ArticleTitle(),
+      condition: (page) => page.frontmatter.layout !== "homepage",
+    }),
     Component.ContentMeta(),
     Component.TagList(),
   ],
