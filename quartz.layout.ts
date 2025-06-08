@@ -26,7 +26,11 @@ export const defaultContentPageLayout: PageLayout = {
       component: Component.ArticleTitle(),
       condition: (page) => page.fileData.frontmatter?.layout !== "homepage",
     }),
-    Component.ContentMeta(),
+    // hide page meta on homepage
+    Component.ConditionalRender({
+      component: Component.ContentMeta(),
+      condition: (page) => page.fileData.frontmatter?.layout !== "homepage",
+    }),
     Component.TagList(),
   ],
   left: [
