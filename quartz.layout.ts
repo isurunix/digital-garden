@@ -24,7 +24,7 @@ export const defaultContentPageLayout: PageLayout = {
     // skip article title rendering when page has frontmatter layout set to homepage
     Component.ConditionalRender({
       component: Component.ArticleTitle(),
-      condition: (page) => page.frontmatter.layout !== "homepage",
+      condition: (page) => page.fileData.frontmatter?.layout !== "homepage",
     }),
     Component.ContentMeta(),
     Component.TagList(),
