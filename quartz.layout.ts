@@ -48,7 +48,7 @@ export const defaultContentPageLayout: PageLayout = {
     }),
     Component.Explorer({
       filterFn: (node) =>
-        node.slugSegment !== "tags" || node.displayName !== "googleabf03e21db30afa3",
+        node.slugSegment !== "tags" && node.displayName !== "googleabf03e21db30afa3",
     }),
   ],
   right: [
