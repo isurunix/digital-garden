@@ -5,7 +5,9 @@ configuration:
   enableSPA: true
   enablePopovers: true
   analytics:
-    provider: plausible
+    provider: umami
+    host: cloud.umami.is
+    websiteId: 623f3807-9597-4c7f-9cfa-4843a3566c20
   locale: en-US
   baseUrl: notes.isurubuddhika.dev
   ignorePatterns:
