@@ -1,5 +1,5 @@
 ---
-title: Scaling for Millions of Users
+title: Scaling for millions of users
 tags:
   - system-design
   - scaling

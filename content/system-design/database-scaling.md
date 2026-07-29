@@ -1,5 +1,5 @@
 ---
-title: Database Scaling
+title: Database scaling
 tags:
   - database
   - scaling

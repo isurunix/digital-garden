@@ -1,5 +1,5 @@
 ---
-title: Designing a Rate Limiter
+title: Designing a rate limiter
 tags:
   - system-design
 date: 2023-09-22
@@ -17,26 +17,31 @@ draft: false
 ## High Level Design
 
 ### Placement of Functionality (Where to put the limiter)
-- **Client side rate limiter**
+
+#### Client side rate limiter
   While it is technically possible to place the rate limiter on client side this can be highly unpredictable as it can be easily forged. Also we may not always have the control of the client. So it doesn't make much sense to place a rate-limiter in client app ^6ba237
-- **Server side rate limiter**
+
+#### Server side rate limiter
   Rate limiter can be placed on the app server it self as a part of the application service
-    ```mermaid
-          graph LR
-          A[Client] -- HTTP/HTTPS --> api-service[api-service]
-          subgraph api-service
-          app-service; 
-          app-service <-.-> rate-limitter
-          end
-    ```
-    - **Pros**
-        - Cannot be forged easily like the client-side implementation
-        - Can be deployed together with the application service
-    - **Cons**
-        - Tightly coupled to app service making it not reusable
-        - Added complexity in the app service which does not exactly address any functional/business requirement
-        - Tight coupling requires app service to be redeployed even for a change in the rate-limiter.
-- **Rate Limiter Service as a middle-ware**
+
+  ```mermaid
+        graph LR
+        A[Client] -- HTTP/HTTPS --> api-service[api-service]
+        subgraph api-service
+        app-service; 
+        app-service <-.-> rate-limitter
+        end
+  ```  
+
+  - **Pros**
+      - Cannot be forged easily like the client-side implementation
+      - Can be deployed together with the application service
+  - **Cons**
+      - Tightly coupled to app service making it not reusable
+      - Added complexity in the app service which does not exactly address any functional/business requirement
+      - Tight coupling requires app service to be redeployed even for a change in the rate-limiter.  
+
+#### Rate Limiter Service as a middle-ware
   Another option would be develop the rate-limiter as a separate service and place it as middle-ware layer between the client and the application service. Most of the time we see this approach in use where API gateway implements the rate limiting functionality as well.
   
   ```mermaid
@@ -51,7 +56,7 @@ draft: false
   - **Cons**
       - One more component to maintain
 
-**Summary**
+#### Summary
 
 > Client side rate limiter is never a good choice. [[#^6ba237]]
 > 
